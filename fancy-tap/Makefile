@@ -1,4 +1,5 @@
-arduino=../arduino-1.8.9/arduino
+arduino=../arduino-1.8.5/arduino
+tty=/dev/ttyUSB0
 
 build:
 	$(arduino) --verify *.ino
@@ -6,5 +7,5 @@ build:
 upload:
 	$(arduino) --upload *.ino \
 		--verbose-upload \
-		--port /dev/ttyUSB0 \
+		--port ${tty} \
 		--board arduino:avr:nano:cpu=atmega328
