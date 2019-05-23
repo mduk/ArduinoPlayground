@@ -1,4 +1,9 @@
 #include <Keypad.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
+
+#define LCD_COLS           16
+#define LCD_ROWS           2
 
 #define VALVE_PIN          13
 
@@ -11,6 +16,25 @@
 
 #define KEYPAD_ROWS        4
 #define KEYPAD_COLS        4
+
+
+
+
+uint8_t bell         [8] = { 0x04, 0x0e, 0x0e, 0x0e, 0x1f, 0x00, 0x04 };
+uint8_t note         [8] = { 0x02, 0x03, 0x02, 0x0e, 0x1e, 0x0c, 0x00 };
+uint8_t clock        [8] = { 0x00, 0x0e, 0x15, 0x17, 0x11, 0x0e, 0x00 };
+uint8_t heart        [8] = { 0x00, 0x0a, 0x1f, 0x1f, 0x0e, 0x04, 0x00 };
+uint8_t duck         [8] = { 0x00, 0x0c, 0x1d, 0x0f, 0x0f, 0x06, 0x00 };
+uint8_t check        [8] = { 0x00, 0x01, 0x03, 0x16, 0x1c, 0x08, 0x00 };
+uint8_t cross        [8] = { 0x00, 0x1b, 0x0e, 0x04, 0x0e, 0x1b, 0x00 };
+uint8_t retarrow     [8] = { 0x01, 0x01, 0x05, 0x09, 0x1f, 0x08, 0x04 };
+
+uint8_t left_empty   [8] = { 0x1F, 0x10, 0x10, 0x10, 0x10, 0x10, 0x1F };
+uint8_t left_full    [8] = { 0x1F, 0x10, 0x17, 0x17, 0x17, 0x10, 0x1F };
+uint8_t middle_empty [8] = { 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x1F };
+uint8_t middle_full  [8] = { 0x1F, 0x00, 0x1F, 0x1F, 0x1F, 0x00, 0x1F };
+uint8_t right_empty  [8] = { 0x1F, 0x01, 0x01, 0x01, 0x01, 0x01, 0x1F };
+uint8_t right_full   [8] = { 0x1F, 0x01, 0x1D, 0x1D, 0x1D, 0x01, 0x1F };
 
 bool do_sensor = true;
 
@@ -30,6 +54,8 @@ const char  kp_col_pins[KEYPAD_COLS] = { 3, 4, 5, 6  };
 #define STATE_OPEN   1
 
 uint8_t state = 0;
+
+LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
 Keypad kp = Keypad(makeKeymap(keymap),
                    kp_row_pins, kp_col_pins,
@@ -51,9 +77,12 @@ void set_state(uint8_t new_state) {
   Serial.print(" => ");
   Serial.println(new_state);
 
+  lcd.clear();
+
   switch (new_state) {
     case STATE_OPEN:
       Serial.println("Opening Valve");
+
       digitalWrite(STATUS_RED_PIN, LOW);
       digitalWrite(STATUS_GRN_PIN, HIGH);
       digitalWrite(VALVE_PIN, HIGH);
@@ -61,9 +90,11 @@ void set_state(uint8_t new_state) {
 
     case STATE_CLOSED:
       Serial.println("Closing Valve. Awaiting Input.");
+
       digitalWrite(STATUS_RED_PIN, HIGH);
       digitalWrite(STATUS_GRN_PIN, LOW);
       digitalWrite(VALVE_PIN, LOW);
+
       dispense_ml = 0;
       totalMilliLitres = 0;
       break;
@@ -74,6 +105,18 @@ void set_state(uint8_t new_state) {
 
 void setup() {
   Serial.begin(9600);
+
+  lcd.init();
+  lcd.backlight();
+  lcd.clear();
+
+  lcd.createChar(0, left_empty);
+  lcd.createChar(1, left_full );
+  lcd.createChar(2, middle_empty);
+  lcd.createChar(3, middle_full);
+  lcd.createChar(4, right_empty);
+  lcd.createChar(5, right_full);
+  lcd.home();
 
   pinMode(STATUS_RED_PIN, OUTPUT);
   digitalWrite(STATUS_RED_PIN, LOW);
@@ -99,6 +142,8 @@ void loop() {
     case STATE_OPEN: loop_open(); break;
     case STATE_CLOSED: loop_closed(); break;
   }
+
+  update_lcd();
 }
 
 void loop_open() {
@@ -155,7 +200,11 @@ void loop_open() {
     attachInterrupt(SENSOR_INTERRUPT, pulseCounter, FALLING);
   }
 
-  if (dispense_ml > 0 && totalMilliLitres > dispense_ml) {
+  if (Serial.available() ) {
+    totalMilliLitres += ((Serial.read() - '0') * 100);
+  }
+
+  if (dispense_ml > 0 && totalMilliLitres >= dispense_ml) {
     set_state(STATE_CLOSED);
     return;
   }
@@ -191,7 +240,7 @@ void loop_closed() {
         break;
 
       case 'B':
-        dispense_ml = 70000;
+        dispense_ml = 7000;
         totalMilliLitres = 0;
         set_state(STATE_OPEN);
         break;
@@ -212,6 +261,57 @@ void loop_closed() {
 
     }
   }
+}
+
+void update_lcd() {
+  lcd.home();
+
+  switch (state) {
+    case STATE_OPEN: {
+      lcd_print_ml(totalMilliLitres);
+      lcd.setCursor(9, 0);
+      lcd_print_ml(dispense_ml);
+
+
+      lcd.setCursor(0, 1);
+      uint8_t percent = (uint8_t)(((float) totalMilliLitres / (float) dispense_ml) * 100);
+      uint8_t barlen = map(percent, 0, 100, 0, 16);
+
+      barlen > 0  && lcd.write(0x101) || lcd.write(0x100);
+      barlen > 1  && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 2  && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 3  && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 4  && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 5  && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 6  && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 7  && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 8  && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 9  && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 10 && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 11 && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 12 && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 13 && lcd.write(0x103) || lcd.write(0x102);
+      barlen > 14 && lcd.write(0x105) || lcd.write(0x104);
+      break;
+    }
+
+    case STATE_CLOSED:
+      lcd.print("CLOSED");
+      lcd.setCursor(9, 0);
+      lcd_print_ml(dispense_ml);
+      break;
+  }
+}
+
+void lcd_print_ml(long ml) {
+  char padded[6];
+  sprintf(padded, "%05d", ml);
+  lcd.print(padded);
+  lcd.print("mL");
+}
+
+void lcd_total_millis() {
+  lcd.setCursor(0, 0);
 }
 
 void pulseCounter() {
