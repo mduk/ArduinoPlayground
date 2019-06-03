@@ -247,18 +247,7 @@ void loop_closed() {
   }
 }
 
-void update_lcd() {
-  lcd.home();
-
-  switch (state) {
-    case STATE_OPEN: {
-      lcd_print_ml(totalMilliLitres);
-      lcd.setCursor(9, 0);
-      lcd_print_ml(dispense_ml);
-
-
-      lcd.setCursor(0, 1);
-      uint8_t percent = (uint8_t)(((float) totalMilliLitres / (float) dispense_ml) * 100);
+void lcd_print_progress(uint8_t percent)
       uint8_t barlen = map(percent, 0, 100, 0, 16);
 
       barlen > 0  && lcd.write(0x101) || lcd.write(0x100);
@@ -276,11 +265,29 @@ void update_lcd() {
       barlen > 12 && lcd.write(0x103) || lcd.write(0x102);
       barlen > 13 && lcd.write(0x103) || lcd.write(0x102);
       barlen > 14 && lcd.write(0x105) || lcd.write(0x104);
+}
+
+void update_lcd() {
+  switch (state) {
+    case STATE_OPEN: {
+      lcd.home();
+      lcd_print_ml(totalMilliLitres);
+
+      lcd.setCursor(9, 0);
+      lcd_print_ml(dispense_ml);
+
+
+      lcd.setCursor(0, 1);
+      lcd_print_progress(
+        (uint8_t)(((float) totalMilliLitres / (float) dispense_ml) * 100)
+      );
       break;
     }
 
     case STATE_CLOSED:
+      lcd.home();
       lcd.print("CLOSED");
+
       lcd.setCursor(9, 0);
       lcd_print_ml(dispense_ml);
       break;
