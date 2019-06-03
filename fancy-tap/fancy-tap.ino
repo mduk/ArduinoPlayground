@@ -17,6 +17,9 @@
 #define KEYPAD_ROWS        4
 #define KEYPAD_COLS        4
 
+#define STATE_CLOSED       0
+#define STATE_OPEN         1
+
 
 
 
@@ -41,12 +44,9 @@ const char  kp_col_pins[KEYPAD_COLS] = { 3, 4, 5, 6  };
 
 // Here be dragons
 
-#define STATE_CLOSED 0
-#define STATE_OPEN   1
-
 uint8_t state = 0;
 
-LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
+LiquidCrystal_I2C lcd(0x27, 16, 2);  // set the LCD address to 0x27 for a 16 chars and 2 line display
 
 Keypad kp = Keypad(makeKeymap(keymap),
                    kp_row_pins, kp_col_pins,
