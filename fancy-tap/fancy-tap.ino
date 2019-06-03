@@ -30,8 +30,6 @@ uint8_t middle_full  [8] = { 0x1F, 0x00, 0x1F, 0x1F, 0x1F, 0x00, 0x1F };
 uint8_t right_empty  [8] = { 0x1F, 0x01, 0x01, 0x01, 0x01, 0x01, 0x1F };
 uint8_t right_full   [8] = { 0x1F, 0x01, 0x1D, 0x1D, 0x1D, 0x01, 0x1F };
 
-bool do_sensor = true;
-
 const char  keymap[KEYPAD_ROWS][KEYPAD_COLS] = {
   { '1', '2', '3', 'A' },
   { '4', '5', '6', 'B' },
@@ -118,12 +116,10 @@ void setup() {
   pinMode(VALVE_PIN, OUTPUT);
   digitalWrite(VALVE_PIN, LOW);
 
-  if (do_sensor) {
-    pinMode(SENSOR_PIN, INPUT);
-    digitalWrite(SENSOR_PIN, HIGH);
+  pinMode(SENSOR_PIN, INPUT);
+  digitalWrite(SENSOR_PIN, HIGH);
 
-    attachInterrupt(SENSOR_INTERRUPT, pulseCounter, FALLING);
-  }
+  attachInterrupt(SENSOR_INTERRUPT, pulseCounter, FALLING);
 
   set_state(STATE_CLOSED);
 }
@@ -138,7 +134,7 @@ void loop() {
 }
 
 void loop_open() {
-  if(do_sensor && (millis() - oldTime) > 1000) { // Only process counters once per second
+  if((millis() - oldTime) > 1000) { // Only process counters once per second
     detachInterrupt(SENSOR_INTERRUPT);
 
     // The hall-effect flow sensor outputs approximately 4.5 pulses per second per
