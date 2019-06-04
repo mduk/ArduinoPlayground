@@ -123,14 +123,21 @@ void setup() {
 
 void loop() {
   switch (state) {
-    case STATE_OPEN: loop_open(); break;
-    case STATE_CLOSED: loop_closed(); break;
+    case STATE_OPEN:
+      loop_open();
+      update_lcd_open();
+      break;
+
+    case STATE_CLOSED:
+      loop_closed();
+      update_lcd_closed();
+      break;
   }
 
   update_lcd();
 }
 
-void loop_open() {
+void read_sensor() {
   if((millis() - oldTime) > 1000) { // Only process counters once per second
     detachInterrupt(SENSOR_INTERRUPT);
 
@@ -183,6 +190,10 @@ void loop_open() {
 
     attachInterrupt(SENSOR_INTERRUPT, pulseCounter, FALLING);
   }
+}
+
+void loop_open() {
+  read_sensor();
 
   if (Serial.available() ) {
     totalMilliLitres += ((Serial.read() - '0') * 100);
@@ -193,6 +204,10 @@ void loop_open() {
     return;
   }
 
+  read_keypad();
+}
+
+void read_keypad() {
   char key = kp.getKey();
   if (key != NO_KEY) {
     set_state(STATE_CLOSED);
@@ -247,6 +262,36 @@ void loop_closed() {
   }
 }
 
+void update_lcd() {
+  switch (state) {
+    case STATE_OPEN: update_lcd_open(); break;
+    case STATE_CLOSED: update_lcd_closed(); break;
+  }
+}
+
+void update_lcd_closed() {
+  lcd.home();
+  lcd.print("CLOSED");
+
+  lcd.setCursor(9, 0);
+  lcd_print_ml(dispense_ml);
+}
+
+void update_lcd_open() {
+  lcd.home();
+  lcd_print_ml(totalMilliLitres);
+
+  lcd.setCursor(9, 0);
+  lcd_print_ml(dispense_ml);
+
+
+  lcd.setCursor(0, 1);
+  lcd_print_progress(
+    (uint8_t)(((float) totalMilliLitres / (float) dispense_ml) * 100)
+  );
+}
+
+
 void lcd_print_progress(uint8_t percent)
       uint8_t barlen = map(percent, 0, 100, 0, 16);
 
@@ -265,33 +310,6 @@ void lcd_print_progress(uint8_t percent)
       barlen > 12 && lcd.write(0x103) || lcd.write(0x102);
       barlen > 13 && lcd.write(0x103) || lcd.write(0x102);
       barlen > 14 && lcd.write(0x105) || lcd.write(0x104);
-}
-
-void update_lcd() {
-  switch (state) {
-    case STATE_OPEN: {
-      lcd.home();
-      lcd_print_ml(totalMilliLitres);
-
-      lcd.setCursor(9, 0);
-      lcd_print_ml(dispense_ml);
-
-
-      lcd.setCursor(0, 1);
-      lcd_print_progress(
-        (uint8_t)(((float) totalMilliLitres / (float) dispense_ml) * 100)
-      );
-      break;
-    }
-
-    case STATE_CLOSED:
-      lcd.home();
-      lcd.print("CLOSED");
-
-      lcd.setCursor(9, 0);
-      lcd_print_ml(dispense_ml);
-      break;
-  }
 }
 
 void lcd_print_ml(long ml) {
