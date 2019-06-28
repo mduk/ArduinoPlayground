@@ -1,4 +1,4 @@
-#define VALVE_PIN          13
+#define VALVE_PIN          3
 
 void valve_setup() {
   pinMode(VALVE_PIN, OUTPUT);
