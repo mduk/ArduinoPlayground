@@ -6,7 +6,7 @@
 #define STASSID  ""
 #define STAPSK   ""
 #define DESTHOST "192.168.0.7"
-#define DESTPORT 4446
+#define DESTPORT 4444
 
 #define ONE_WIRE_BUS 0
 
