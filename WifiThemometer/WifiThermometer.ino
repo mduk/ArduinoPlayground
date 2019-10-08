@@ -3,8 +3,10 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-#define STASSID "Airport Extreme"
-#define STAPSK  "getoffmylan"
+#define STASSID  ""
+#define STAPSK   ""
+#define DESTHOST "192.168.0.7"
+#define DESTPORT 4446
 
 #define ONE_WIRE_BUS 0
 
@@ -35,7 +37,7 @@ void loop() {
   char buf[6];
   sprintf(buf, "%s %.2f\n", WiFi.localIP().toString().c_str(), temperature);
 
-  Udp.beginPacket("192.168.0.25", 4446);
+  Udp.beginPacket(DESTHOST, DESTPORT);
   Udp.write(buf);
   Udp.endPacket();
 
