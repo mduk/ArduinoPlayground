@@ -1,45 +1,30 @@
-#include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
 
-#define STASSID  ""
-#define STAPSK   ""
-#define DESTHOST "192.168.0.7"
-#define DESTPORT 4444
-
-#define ONE_WIRE_BUS 0
-
-OneWire oneWire(ONE_WIRE_BUS);
-DallasTemperature sensors(&oneWire);
-
-WiFiUDP Udp;
+#include "config.h"
+#include "wifi.h"
+#include "udp.h"
+#include "tcp.h"
+#include "dallastemp.h"
 
 void setup() {
   Serial.begin(9600);
-  sensors.begin();
 
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(STASSID, STAPSK);
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print('.');
-    delay(500);
-  }
-  Serial.print("Connected! IP address: ");
-  Serial.println(WiFi.localIP());
+  wifi::setup();
+  dallastemp::setup();
+
+  //udp::setup();
+  tcp::setup();
 }
 
 void loop() {
-  sensors.requestTemperatures();
-  float temperature = sensors.getTempCByIndex(0);
-  Serial.println(temperature);
+  wifi::loop();
+  dallastemp::loop();
 
-  char buf[6];
-  sprintf(buf, "%s %.2f\n", WiFi.localIP().toString().c_str(), temperature);
+  static esp8266::polledTimeout::periodicMs timeout(INTERVAL);
+  if (!timeout.expired()) {
+    return;
+  }
 
-  Udp.beginPacket(DESTHOST, DESTPORT);
-  Udp.write(buf);
-  Udp.endPacket();
-
-  delay(1000);
+  //udp::loop();
+  tcp::loop();
 }
