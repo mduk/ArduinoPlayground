@@ -1,5 +1,5 @@
 arduino=../arduino-1.8.5/arduino
-tty=/dev/ttyUSB2
+tty=/dev/ttyUSB0
 
 build:
 	$(arduino) --verify *.ino
