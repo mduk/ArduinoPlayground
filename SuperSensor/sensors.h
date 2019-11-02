@@ -10,7 +10,8 @@ struct sensordata {
   String time;
   String c;
   String lx;
-  String adc;
+  int adc;
+  String adc_str;
 };
 
 namespace sensors {
@@ -21,7 +22,8 @@ namespace sensors {
     readings.time = ntpclock::getTimeString();
     readings.c = dallastemp::getCelciusString();
     readings.lx = maximlux::getLuxString();
-    readings.adc = adc::getReadingString();
+    readings.adc = adc::getReading();
+    readings.adc_str = adc::getReadingString();
 
     return readings;
   }
