@@ -16,7 +16,7 @@
 
 #define HTTP_LISTEN_PORT 80
 
-#define UDP_DESTHOST     "192.168.0.7"
+#define UDP_DESTHOST     "janet.local"
 #define UDP_DESTPORT     4444
 
 #define TCP_DESTHOST     "192.168.0.7"
