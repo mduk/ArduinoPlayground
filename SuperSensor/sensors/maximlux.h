@@ -9,6 +9,8 @@ namespace maximlux {
   float lux = 0;
 
   void setup() {
+    Wire.begin();
+
     if (light.begin()) {
       Serial.println("maximlux::setup - Error communicating with MAX44009");
     }
