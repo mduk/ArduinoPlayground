@@ -100,12 +100,12 @@ namespace mdns {
     // Init the (currently empty) host domain string with 'esp8266'
     if ((!MDNSResponder::indexDomain(pcHostDomain, 0, "esp8266")) ||
         (!MDNS.begin(pcHostDomain))) {
-      Serial.println("mdns.setup Error setting up MDNS responder!");
+      Serial.println("mdns::setup Error setting up MDNS responder!");
       while (1) { // STOP
         delay(1000);
       }
     }
-    Serial.println("mdns.setup MDNS responder started");
+    Serial.println("mdns::setup MDNS responder started");
   }
 
   void loop() {
