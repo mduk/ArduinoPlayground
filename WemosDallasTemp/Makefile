@@ -1,7 +1,7 @@
 arduino=../arduino-1.8.5/arduino
 screen=/usr/bin/screen
 board=esp8266:esp8266:d1_mini
-tty=/dev/ttyUSB1
+tty=/dev/ttyUSB0
 baud=115200
 
 build:
