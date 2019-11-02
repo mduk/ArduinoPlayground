@@ -29,4 +29,6 @@ void loop() {
   sensors::loop();
   udp::loop();
 //  tcp::setup();
+
+  delay(INTERVAL);
 }
