@@ -16,15 +16,7 @@ namespace serialconsole {
       char c = Serial.read();
 
       sensordata readings = sensors::read();
-
-      int adc_percent = map(readings.adc, 0, 1024, 0, 100);
-
-      String l = "<" + readings.time + ">  "
-               + readings.c + "C "
-               + readings.lx + "lx "
-               + String(adc_percent) + "%";
-
-      Serial.println(l);
+      Serial.println(sensors::asString(readings));
     }
   }
 

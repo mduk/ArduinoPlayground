@@ -46,8 +46,8 @@ namespace mdns {
   void MDNSDynamicServiceTxtCallback(const MDNSResponder::hMDNSService p_hService) {
     if (hMDNSService == p_hService) {
       sensordata readings = sensors::read();
-      MDNS.addDynamicServiceTxt(p_hService, "curtime", readings.time.c_str());
-      MDNS.addDynamicServiceTxt(p_hService, "temp_c", readings.c.c_str());
+      MDNS.addDynamicServiceTxt(p_hService, "curtime", readings.timeString.c_str());
+      MDNS.addDynamicServiceTxt(p_hService, "temp_c", readings.cString.c_str());
     }
   }
 

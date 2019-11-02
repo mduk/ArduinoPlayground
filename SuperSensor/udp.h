@@ -16,7 +16,7 @@ namespace udp {
     sensordata readings = sensors::read();
 
     Udp.beginPacket(UDP_DESTHOST, UDP_DESTPORT);
-    Udp.println(readings.c);
+    Udp.println(sensors::asString(readings));
     Udp.endPacket();
   }
 

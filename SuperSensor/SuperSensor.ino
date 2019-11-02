@@ -4,6 +4,8 @@
 #include "mdns.h"
 #include "ntpclock.h"
 #include "webserver.h"
+#include "udp.h"
+#include "tcp.h"
 
 void setup() {
   delay(1000);
@@ -12,8 +14,10 @@ void setup() {
   wifi::setup();
   mdns::setup();
   ntpclock::setup();
-  webserver::setup();
+//  webserver::setup();
   sensors::setup();
+  udp::setup();
+//  tcp::setup();
 }
 
 void loop() {
@@ -21,6 +25,8 @@ void loop() {
   wifi::loop();
   mdns::loop();
   ntpclock::loop();
-  webserver::loop();
+//  webserver::loop();
   sensors::loop();
+  udp::loop();
+//  tcp::setup();
 }

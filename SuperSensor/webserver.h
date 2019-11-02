@@ -11,26 +11,15 @@ namespace webserver {
   void handleHTTPRequest() {
 
     sensordata readings = sensors::read();
+    String sensorString = sensors::asString(readings);
 
-    String l = "webserver::handleHTTPRequest - " + readings.time + " " + readings.c + "C " + readings.lx + "lx";
+    String l = "webserver::handleHTTPRequest - " + sensorString;
     Serial.println(l);
 
     String s;
 
     s = "<!DOCTYPE HTML>\r\n";
-    s += "<dl>\r\n";
-
-    s += "<dt>Time</dt>";
-    s += "<dd>" + readings.time + "</dd>\r\n";
-
-    s += "<dt>Celcius (DS18B20)</dt>";
-    s += "<dd>" + readings.c + "</dd>\r\n";
-
-    s += "<dt>Lux (MAX44009)</dt>";
-    s += "<dd>" + readings.lx + "</dd>\r\n";
-
-    s += "</dl>";
-
+    s += sensorString;
     s += "</html>\r\n\r\n";
 
     server.send(200, "text/html", s);
