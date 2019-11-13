@@ -66,4 +66,4 @@ namespace sensors {
     adc::loop();
   }
 
-};
+}
