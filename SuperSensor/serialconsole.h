@@ -8,6 +8,8 @@ namespace serialconsole {
     Serial.println();
     Serial.println();
     Serial.println();
+    Serial.print("ESP Chip ID: ");
+    Serial.println(ESP.getChipId());
   }
 
   void loop() {
