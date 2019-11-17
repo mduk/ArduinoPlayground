@@ -17,8 +17,10 @@ namespace serialconsole {
     if (Serial.available()) {
       char c = Serial.read();
 
-      sensordata readings = sensors::read();
-      Serial.println(sensors::asString(readings));
+      switch (c) {
+        case 'p': mqtt::publish(); break;
+        case 'r': Serial.println(sensors::asString(sensors::read())); break;
+      }
     }
   }
 
