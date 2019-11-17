@@ -15,6 +15,9 @@ struct sensordata {
   float c;
   String cString;
 
+  float c2;
+  String c2String;
+
   float lx;
   String lxString;
 
@@ -32,8 +35,11 @@ namespace sensors {
     readings.time = ntpclock::getTime();
     readings.timeString = ntpclock::getTimeString();
 
-    readings.c = dallastemp::getCelcius();
-    readings.cString = dallastemp::getCelciusString();
+    readings.c = dallastemp::getCelcius(0);
+    readings.cString = dallastemp::getCelciusString(0);
+
+    readings.c2 = dallastemp::getCelcius(1);
+    readings.c2String = dallastemp::getCelciusString(1);
 
     readings.lx = maximlux::getLux();
     readings.lxString = maximlux::getLuxString();
@@ -50,6 +56,7 @@ namespace sensors {
              + readings.chipId + " "
              + readings.time + " "
              + readings.c + "C "
+             + readings.c2 + "C "
              + readings.lx + "lx "
              + adc_percent + "%";
   }

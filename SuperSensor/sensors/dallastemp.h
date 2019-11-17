@@ -21,12 +21,12 @@ namespace dallastemp {
     sensors.requestTemperatures();
   }
 
-  float getCelcius() {
-    return sensors.getTempCByIndex(0);
+  float getCelcius(int sensor) {
+    return sensors.getTempCByIndex(sensor);
   }
 
-  String getCelciusString() {
-    float temperature = getCelcius();
+  String getCelciusString(int sensor) {
+    float temperature = getCelcius(sensor);
 
     char buf[6];
     sprintf(buf, "%.2f", temperature);
