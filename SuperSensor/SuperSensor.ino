@@ -6,6 +6,7 @@
 #include "webserver.h"
 #include "udp.h"
 #include "tcp.h"
+#include "mqtt.h"
 
 void setup() {
   delay(1000);
@@ -13,23 +14,29 @@ void setup() {
 
   serialconsole::setup();
   wifi::setup();
-  mdns::setup();
+//  mdns::setup();
   ntpclock::setup();
-//  webserver::setup();
   sensors::setup();
-  udp::setup();
+
+//  webserver::setup();
+//  udp::setup();
 //  tcp::setup();
+
+  mqtt::setup();
 }
 
 void loop() {
   serialconsole::loop();
   wifi::loop();
-  mdns::loop();
+//  mdns::loop();
   ntpclock::loop();
-//  webserver::loop();
   sensors::loop();
-  udp::loop();
-//  tcp::setup();
+
+//  webserver::loop();
+//  udp::loop();
+//  tcp::loop();
+
+  mqtt::loop();
 
   delay(INTERVAL);
 }

@@ -1,4 +1,5 @@
 #include "sensors.h"
+#include "mqtt.h"
 
 namespace serialconsole {
 
