@@ -14,9 +14,10 @@ void setup() {
 
   serialconsole::setup();
   wifi::setup();
-//  mdns::setup();
-  ntpclock::setup();
   sensors::setup();
+
+//  mdns::setup();
+//  ntpclock::setup();
 
 //  webserver::setup();
 //  udp::setup();
@@ -28,9 +29,10 @@ void setup() {
 void loop() {
   serialconsole::loop();
   wifi::loop();
-//  mdns::loop();
-  ntpclock::loop();
   sensors::loop();
+
+//  mdns::loop();
+//  ntpclock::loop();
 
 //  webserver::loop();
 //  udp::loop();
