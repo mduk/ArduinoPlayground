@@ -12,18 +12,7 @@ namespace mqtt {
   String temp1_feed = String(AIO_USERNAME "/feeds/")
                     + ESP.getChipId()
                     + "-temp1";
-
-  String temp2_feed = String(AIO_USERNAME "/feeds/")
-                    + ESP.getChipId()
-                    + "-temp2";
-
-  String light_feed = String(AIO_USERNAME "/feeds/")
-                    + ESP.getChipId()
-                    + "-light";
-
-  Adafruit_MQTT_Publish temp1 = Adafruit_MQTT_Publish(&mqtt, temp1_feed.c_str());
-  Adafruit_MQTT_Publish temp2 = Adafruit_MQTT_Publish(&mqtt, temp2_feed.c_str());
-  Adafruit_MQTT_Publish light = Adafruit_MQTT_Publish(&mqtt, light_feed.c_str());
+  Adafruit_MQTT_Publish temp1    = Adafruit_MQTT_Publish(&mqtt,    temp1_feed.c_str());
 
   void connect();
   void disconnect();
@@ -47,14 +36,8 @@ namespace mqtt {
 
     sensordata readings = sensors::read();
 
-    temp1.publish(readings.c ) && Serial.println(F("mqtt::publish - Temp1 published"))
+    temp1.publish(readings.c ) && Serial.print(F("mqtt::publish - Temp1 published: ")) && Serial.println(readings.c )
                                || Serial.println(F("mqtt::publish - Temp1 publish failed"));
-
-    temp2.publish(readings.c2) && Serial.println(F("mqtt::publish - Temp2 published"))
-                               || Serial.println(F("mqtt::publish - Temp2 publish failed"));
-
-    light.publish(readings.lx) && Serial.println(F("mqtt::publish - Light published"))
-                               || Serial.println(F("mqtt::publish - Light publish failed"));
 
     disconnect();
   }
