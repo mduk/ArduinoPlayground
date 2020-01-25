@@ -5,6 +5,7 @@
 #include "sensors/dallastemp.h"
 #include "sensors/maximlux.h"
 #include "sensors/adc.h"
+#include "sensors/humidity.h"
 
 struct sensordata {
   uint32_t chipId;
@@ -15,8 +16,8 @@ struct sensordata {
   float c;
   String cString;
 
-  float c2;
-  String c2String;
+  float rh;
+  String rhString;
 
   float lx;
   String lxString;
@@ -38,8 +39,8 @@ namespace sensors {
     readings.c = dallastemp::getCelcius(0);
     readings.cString = dallastemp::getCelciusString(0);
 
-    readings.c2 = dallastemp::getCelcius(1);
-    readings.c2String = dallastemp::getCelciusString(1);
+    readings.rh = humidity::getRelativeHumidity();
+    readings.rhString = humidity::getRelativeHumidityString();
 
     readings.lx = maximlux::getLux();
     readings.lxString = maximlux::getLuxString();
@@ -56,7 +57,7 @@ namespace sensors {
              + readings.chipId + " "
              + readings.time + " "
              + readings.c + "C "
-             + readings.c2 + "C "
+             + readings.rh + "RH "
              + readings.lx + "lx "
              + adc_percent + "%";
   }
@@ -65,12 +66,14 @@ namespace sensors {
     dallastemp::setup();
     maximlux::setup();
     adc::setup();
+    humidity::setup();
   }
 
   void loop() {
     dallastemp::loop();
     maximlux::loop();
     adc::loop();
+    humidity::loop();
   }
 
 }
