@@ -82,10 +82,10 @@ void loop() {
   int minutes_units = now_minute % 10;
 
   switch (displayDigit) {
-    case 1: digit(1); segments(hours_tens); break;
-    case 2: digit(2); segments(hours_units); break;
-    case 3: digit(3); segments(minutes_tens); break;
-    case 4: digit(4); segments(minutes_units); break;
+    case 1: setDigit(1); setSegments(hours_tens); break;
+    case 2: setDigit(2); setSegments(hours_units); break;
+    case 3: setDigit(3); setSegments(minutes_tens); break;
+    case 4: setDigit(4); setSegments(minutes_units); break;
   }
 
   displayDigit++;
@@ -100,7 +100,7 @@ void loop() {
   last_second = now_second;
 }
 
-void digit(int digit) {
+void setDigit(int digit) {
   switch (digit) {
     case 1:
       digitalWrite(digit1, HIGH);
@@ -132,7 +132,7 @@ void digit(int digit) {
   }
 }
 
-void segments(int value) {
+void setSegments(int value) {
   int index = value;
 
   if (value > 0) {
