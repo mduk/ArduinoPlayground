@@ -36,6 +36,9 @@ int last_second;
 
 
 void setup() {
+  Serial.begin(9600);
+  while (!Serial);
+
   setSyncProvider(RTC.get);
 
   pinMode(digit1, OUTPUT);
@@ -72,20 +75,46 @@ void setup() {
 int displayDigit = 1;
 
 void loop() {
+  if (Serial.available()) {
+    String settimestr = Serial.readString();
+    int setyear, setmonth, setday,
+        sethour, setminute, setsecond;
+
+    sscanf(
+      settimestr.c_str(), "%d-%d-%d_%d:%d:%d",
+      &setyear, &setmonth, &setday,
+      &sethour, &setminute, &setsecond
+    );
+
+    tmElements_t settime;
+    settime.Year = setyear;
+    settime.Month = setmonth;
+    settime.Day = setday;
+    settime.Hour = sethour;
+    settime.Minute = setminute;
+    settime.Second = setsecond;
+    RTC.write(settime);
+
+    setTime(
+      sethour, setminute, setsecond,
+      setday, setmonth, setyear
+    );
+  }
+
   int now_hour = hour();
   int now_minute = minute();
   int now_second = second();
 
-  int hours_tens = now_hour / 10;
-  int hours_units = now_hour % 10;
-  int minutes_tens = now_minute / 10;
-  int minutes_units = now_minute % 10;
+  int display_digit1 = charSegments(now_hour   / 10); // Hour Tens
+  int display_digit2 = charSegments(now_hour   % 10); // Hour Units
+  int display_digit3 = charSegments(now_minute / 10); // Minute Tens
+  int display_digit4 = charSegments(now_minute % 10); // Minute Units
 
   switch (displayDigit) {
-    case 1: setDigit(1); setSegments(charSegments(hours_tens   )); break;
-    case 2: setDigit(2); setSegments(charSegments(hours_units  )); break;
-    case 3: setDigit(3); setSegments(charSegments(minutes_tens )); break;
-    case 4: setDigit(4); setSegments(charSegments(minutes_units)); break;
+    case 1: setDigit(1); setSegments(display_digit1); break;
+    case 2: setDigit(2); setSegments(display_digit2); break;
+    case 3: setDigit(3); setSegments(display_digit3); break;
+    case 4: setDigit(4); setSegments(display_digit4); break;
   }
 
   displayDigit++;
@@ -113,10 +142,6 @@ byte mask(int step, byte segments) {
   }
 
   return segments & mask;
-}
-
-byte maskOff(byte from) {
-  return from & 0b01100010;
 }
 
 byte charSegments(int value) {
@@ -164,4 +189,3 @@ void setSegments(byte segments) {
   digitalWrite(segmentF, !((segments >> 1 ) & 1));
   digitalWrite(segmentG, !((segments      ) & 1));
 }
-
