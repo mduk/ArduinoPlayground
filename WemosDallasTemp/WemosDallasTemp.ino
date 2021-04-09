@@ -3,7 +3,7 @@
 #include <DallasTemperature.h>
 
 // Data wire is plugged into port 2 on the Arduino
-#define ONE_WIRE_BUS 0
+#define ONE_WIRE_BUS D3
 
 // Setup a oneWire instance to communicate with any OneWire devices (not just Maxim/Dallas temperature ICs)
 OneWire oneWire(ONE_WIRE_BUS);
@@ -31,5 +31,8 @@ void setup(void)
 void loop(void)
 {
   sensors.requestTemperatures();
-  Serial.println(sensors.getTempCByIndex(0));
+  Serial.print(sensors.getTempCByIndex(0));
+  Serial.println();
+
+  delay(1000);
 }
