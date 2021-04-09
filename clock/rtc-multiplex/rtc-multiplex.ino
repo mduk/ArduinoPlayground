@@ -30,10 +30,6 @@ byte characters[] = {
   0b01111011, // 9
 };
 
-int last_hour;
-int last_minute;
-int last_second;
-
 
 void setup() {
   Serial.begin(9600);
@@ -66,13 +62,17 @@ void setup() {
   digitalWrite(segmentE, HIGH);
   digitalWrite(segmentF, HIGH);
   digitalWrite(segmentG, HIGH);
-
-  last_hour = hour();
-  last_minute = minute();
-  last_second = second();
 }
 
-int displayDigit = 1;
+int display_digit = 1;
+
+byte digit1_segments, digit2_segments,
+     digit3_segments, digit4_segments;
+
+int now_hour, now_minute, now_second,
+    then_hour, then_minute, then_second;
+
+unsigned long now_second_millis, now_millis;
 
 void loop() {
   if (Serial.available()) {
@@ -101,32 +101,36 @@ void loop() {
     );
   }
 
-  int now_hour = hour();
-  int now_minute = minute();
-  int now_second = second();
+  now_hour = hour();
+  now_minute = minute();
+  now_second = second();
 
-  int display_digit1 = charSegments(now_hour   / 10); // Hour Tens
-  int display_digit2 = charSegments(now_hour   % 10); // Hour Units
-  int display_digit3 = charSegments(now_minute / 10); // Minute Tens
-  int display_digit4 = charSegments(now_minute % 10); // Minute Units
-
-  switch (displayDigit) {
-    case 1: setDigit(1); setSegments(display_digit1); break;
-    case 2: setDigit(2); setSegments(display_digit2); break;
-    case 3: setDigit(3); setSegments(display_digit3); break;
-    case 4: setDigit(4); setSegments(display_digit4); break;
+  if (now_second > then_second) {
+    now_second_millis = millis();
+    now_millis = now_second_millis;
+  }
+  else {
+    now_millis = millis() - now_second_millis;
   }
 
-  displayDigit++;
-  if (displayDigit == 5) {
-    displayDigit = 1;
+  digit1_segments = charSegments(now_hour   / 10); // Hour Tens
+  digit2_segments = charSegments(now_hour   % 10); // Hour Units
+  digit3_segments = charSegments(now_minute / 10); // Minute Tens
+  digit4_segments = charSegments(now_minute % 10); // Minute Units
+
+  switch (display_digit) {
+    case 1: setDigit(1); setSegments(digit1_segments); break;
+    case 2: setDigit(2); setSegments(digit2_segments); break;
+    case 3: setDigit(3); setSegments(digit3_segments); break;
+    case 4: setDigit(4); setSegments(digit4_segments); break;
+  }
+
+  display_digit++;
+  if (display_digit == 5) {
+    display_digit = 1;
   }
 
   delay(1);
-
-  last_hour = now_hour;
-  last_minute = now_minute;
-  last_second = now_second;
 }
 
 byte mask(int step, byte segments) {
